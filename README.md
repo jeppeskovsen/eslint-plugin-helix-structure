@@ -1,1 +1,1 @@
-# eslint-plugin-sitecore-helix
+# eslint-plugin-helix-structure

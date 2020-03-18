@@ -1,0 +1,36 @@
+{
+  "name": "eslint-plugin-helix-structure",
+  "version": "1.0.0",
+  "description": "Eslint plugin for helix structure",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "mocha",
+    "build": "babel src/index.ts --out-file lib/index.js",
+    "typecheck": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jeppeskovsen/eslint-plugin-helix-structure.git"
+  },
+  "author": "Jeppe Skovsen",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jeppeskovsen/eslint-plugin-helix-structure/issues"
+  },
+  "homepage": "https://github.com/jeppeskovsen/eslint-plugin-helix-structure#readme",
+  "devDependencies": {
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.8.7",
+    "@babel/preset-env": "^7.8.7",
+    "@babel/preset-typescript": "^7.8.3",
+    "mocha": "^7.1.1",
+    "ts-node": "^8.6.2",
+    "typescript": "^3.8.3"
+  },
+  "dependencies": {
+    "@types/chai": "^4.2.11",
+    "@types/mocha": "^7.0.2",
+    "@types/node": "^13.9.1",
+    "chai": "^4.2.0"
+  }
+}
