@@ -54,7 +54,7 @@ ruleTester.run("restricted-imports", rule, {
         basePath: "./tests/files"
       }],
       errors: [{
-        message: 'Unexpected path "../SuperBanner". Cannot import feature into a another feature.',
+        message: "Unexpected path '../SuperBanner'. Cannot import feature into a another feature.",
         line: 1,
         column: 8,
       }]
@@ -66,11 +66,11 @@ ruleTester.run("restricted-imports", rule, {
         basePath: "./tests/files"
       }],
       errors: [{
-        message: 'Unexpected path "../../feature/SuperBanner". Cannot import feature into foundation.',
+        message: "Unexpected path '../../feature/SuperBanner'. Cannot import feature into foundation.",
         line: 1,
         column: 8,
       }, {
-        message: 'Unexpected path "../../project/Eslint". Cannot import project into foundation.',
+        message: "Unexpected path '../../project/Eslint'. Cannot import project into foundation.",
         line: 2,
         column: 8,
       }]

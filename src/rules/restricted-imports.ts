@@ -10,7 +10,6 @@ export default {
     docs: {
       url: "todo",
     },
-
     schema: [
       {
         type: "object",
@@ -30,7 +29,6 @@ export default {
 
     function checkForRestrictedImportPath(importPath: string, node: any) {
       const absoluteImportPath: string = resolve(importPath, context)
-
       if (!absoluteImportPath) {
         return
       }
@@ -41,13 +39,10 @@ export default {
       const [importLayerName, importModuleName] = getLayerAndModuleName(absoluteImportPath, absoluteBasePath);
       if (!importLayerName || !importModuleName) return;
 
-      console.log(currentLayerName, currentModuleName)
-      console.log(importLayerName, importModuleName)
-
       if (currentLayerName === "feature" && importLayerName === "feature" && currentModuleName !== importModuleName) {
         context.report({
           node,
-          message: `Unexpected path "{{importPath}}". Cannot import {{currentLayerName}} into a another {{importLayerName}}.`,
+          message: "Unexpected path '{{importPath}}'. Cannot import {{currentLayerName}} into a another {{importLayerName}}.",
           data: { importPath, currentLayerName, importLayerName },
         })
       }
@@ -55,7 +50,7 @@ export default {
       if (currentLayerName === "feature" && importLayerName === "project") {
         context.report({
           node,
-          message: `Unexpected path "{{importPath}}". Cannot import {{importLayerName}} into a {{currentLayerName}}.`,
+          message: "Unexpected path '{{importPath}}'. Cannot import {{importLayerName}} into a {{currentLayerName}}.",
           data: { importPath, currentLayerName, importLayerName },
         })
       }
@@ -63,7 +58,7 @@ export default {
       if (currentLayerName === "foundation" && importLayerName === "feature" || importLayerName === "project") {
         context.report({
           node,
-          message: `Unexpected path "{{importPath}}". Cannot import {{importLayerName}} into {{currentLayerName}}.`,
+          message: "Unexpected path '{{importPath}}'. Cannot import {{importLayerName}} into {{currentLayerName}}.",
           data: { importPath, currentLayerName, importLayerName },
         })
       }

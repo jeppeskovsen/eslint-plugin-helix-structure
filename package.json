@@ -1,11 +1,12 @@
 {
   "name": "eslint-plugin-helix-structure",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "description": "Eslint plugin for helix structure",
-  "main": "src/index.js",
+  "main": "lib/index.js",
   "scripts": {
     "test": "mocha",
-    "build": "babel src/index.ts --out-file lib/index.js",
+    "build": "babel ./src --out-dir ./lib --extensions .ts",
+    "publish": "npm run typecheck && npm test && npm run build && npm publish",
     "typecheck": "tsc"
   },
   "repository": {
