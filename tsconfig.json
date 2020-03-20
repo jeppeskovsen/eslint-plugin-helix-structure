@@ -8,7 +8,7 @@
     "noEmit": true,
     "sourceMap": false,
     "esModuleInterop": true,
-    "types": ["node", "mocha"]
+    "types": ["node", "mocha", "eslint"]
   },
   "include": [
     "src/**/*"

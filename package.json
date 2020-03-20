@@ -30,8 +30,11 @@
   },
   "dependencies": {
     "@types/chai": "^4.2.11",
-    "@types/node": "^13.9.1",
+    "@types/eslint": "^6.1.8",
     "@types/mocha": "^7.0.2",
-    "chai": "^4.2.0"
+    "@types/node": "^13.9.1",
+    "chai": "^4.2.0",
+    "eslint-import-resolver-node": "^0.3.3",
+    "eslint-module-utils": "^2.5.2"
   }
 }

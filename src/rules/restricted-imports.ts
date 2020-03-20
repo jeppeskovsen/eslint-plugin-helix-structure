@@ -1,11 +1,10 @@
-//import containsPath from "contains-path"
+import { getLayerAndModuleName } from "../utils/helix"
+import { Rule } from "eslint"
 import path from "path"
 import { isStaticRequire } from "../utils/static-require"
+import resolve from "eslint-module-utils/resolve"
 
-// import resolve from "eslint-module-utils/resolve"
-// import importType from "../core/importType"
-
-module.exports = {
+export default {
   meta: {
     type: "problem",
     docs: {
@@ -23,76 +22,58 @@ module.exports = {
     ],
   },
 
-  create: function noRestrictedPaths(context) {
+  create: function noRestrictedPaths(context: any) {
     const options = context.options[0] || {}
-    const restrictedPaths = options.basePath || []
-    const basePath = options.basePath || process.cwd()
-    const currentFilename = context.getFilename()
-    // const matchingZones = restrictedPaths.filter((zone) => {
-    //   const targetPath = path.resolve(basePath, zone.target)
+    const basePath = options.basePath || path.join(process.cwd(), "./src")
+    const absoluteBasePath = path.resolve(basePath)
+    const absoluteCurrentPath = context.getFilename()
 
-    //   return containsPath(currentFilename, targetPath)
-    // })
+    function checkForRestrictedImportPath(importPath: string, node: any) {
+      const absoluteImportPath: string = resolve(importPath, context)
 
-    // function isValidExceptionPath(absoluteFromPath, absoluteExceptionPath) {
-    //   const relativeExceptionPath = path.relative(absoluteFromPath, absoluteExceptionPath)
+      if (!absoluteImportPath) {
+        return
+      }
 
-    //   return importType(relativeExceptionPath, context) !== "parent"
-    // }
+      const [currentLayerName, currentModuleName] = getLayerAndModuleName(absoluteCurrentPath, absoluteBasePath);
+      if (!currentLayerName || !currentModuleName) return;
 
-    // function reportInvalidExceptionPath(node) {
-    //   context.report({
-    //     node,
-    //     message: "Restricted path exceptions must be descendants of the configured `from` path for that zone.",
-    //   })
-    // }
+      const [importLayerName, importModuleName] = getLayerAndModuleName(absoluteImportPath, absoluteBasePath);
+      if (!importLayerName || !importModuleName) return;
 
-    function checkForRestrictedImportPath(importPath, node) {
-      // const absoluteImportPath = resolve(importPath, context)
+      console.log(currentLayerName, currentModuleName)
+      console.log(importLayerName, importModuleName)
 
-      // if (!absoluteImportPath) {
-      //   return
-      // }
+      if (currentLayerName === "feature" && importLayerName === "feature" && currentModuleName !== importModuleName) {
+        context.report({
+          node,
+          message: `Unexpected path "{{importPath}}". Cannot import {{currentLayerName}} into a another {{importLayerName}}.`,
+          data: { importPath, currentLayerName, importLayerName },
+        })
+      }
 
-      // matchingZones.forEach((zone) => {
-      //   const exceptionPaths = zone.except || []
-      //   const absoluteFrom = path.resolve(basePath, zone.from)
+      if (currentLayerName === "feature" && importLayerName === "project") {
+        context.report({
+          node,
+          message: `Unexpected path "{{importPath}}". Cannot import {{importLayerName}} into a {{currentLayerName}}.`,
+          data: { importPath, currentLayerName, importLayerName },
+        })
+      }
 
-      //   if (!containsPath(absoluteImportPath, absoluteFrom)) {
-      //     return
-      //   }
-
-      //   const absoluteExceptionPaths = exceptionPaths.map((exceptionPath) =>
-      //     path.resolve(absoluteFrom, exceptionPath)
-      //   )
-      //   const hasValidExceptionPaths = absoluteExceptionPaths
-      //     .every((absoluteExceptionPath) => isValidExceptionPath(absoluteFrom, absoluteExceptionPath))
-
-      //   if (!hasValidExceptionPaths) {
-      //     reportInvalidExceptionPath(node)
-      //     return
-      //   }
-
-      //   const pathIsExcepted = absoluteExceptionPaths
-      //     .some((absoluteExceptionPath) => containsPath(absoluteImportPath, absoluteExceptionPath))
-
-      //   if (pathIsExcepted) {
-      //     return
-      //   }
-
-      //   context.report({
-      //     node,
-      //     message: `Unexpected path "{{importPath}}" imported in restricted zone.`,
-      //     data: { importPath },
-      //   })
-      // })
+      if (currentLayerName === "foundation" && importLayerName === "feature" || importLayerName === "project") {
+        context.report({
+          node,
+          message: `Unexpected path "{{importPath}}". Cannot import {{importLayerName}} into {{currentLayerName}}.`,
+          data: { importPath, currentLayerName, importLayerName },
+        })
+      }
     }
 
     return {
-      ImportDeclaration(node) {
+      ImportDeclaration(node: any) {
         checkForRestrictedImportPath(node.source.value, node.source)
       },
-      CallExpression(node) {
+      CallExpression(node: any) {
         if (isStaticRequire(node)) {
           const [ firstArgument ] = node.arguments
 
@@ -101,4 +82,4 @@ module.exports = {
       },
     }
   },
-}
+} as Rule.RuleModule
