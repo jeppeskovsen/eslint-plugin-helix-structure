@@ -16,3 +16,11 @@ export function test(t) {
     }
   }
 }
+
+export function message(msg, keys) {
+  for (const key of Object.keys(keys)) {
+    msg = msg.replace(`{{${key}}}`, keys[key])
+  }
+
+  return msg
+}

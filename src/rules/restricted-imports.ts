@@ -4,6 +4,14 @@ import path from "path"
 import { isStaticRequire } from "../utils/static-require"
 import resolve from "eslint-module-utils/resolve"
 
+export const messages = {
+  featureIntoFeature: "Unexpected path '{{importPath}}'. Cannot import Feature into another Feature.",
+  projectIntoFeature: "Unexpected path '{{importPath}}'. Cannot import Project into a Feature.",
+  featureIntoFoundation: "Unexpected path '{{importPath}}'. Cannot import Feature into Foundation.",
+  projectIntoFoundation: "Unexpected path '{{importPath}}'. Cannot import Project into Foundation.",
+  projectIntoProject: "Unexpected path '{{importPath}}'. Cannot import Project into another Project."
+}
+
 export default {
   meta: {
     type: "problem",
@@ -42,24 +50,40 @@ export default {
       if (currentLayerName === "feature" && importLayerName === "feature" && currentModuleName !== importModuleName) {
         context.report({
           node,
-          message: "Unexpected path '{{importPath}}'. Cannot import {{currentLayerName}} into a another {{importLayerName}}.",
-          data: { importPath, currentLayerName, importLayerName },
+          message: messages.featureIntoFeature,
+          data: { importPath },
         })
       }
 
       if (currentLayerName === "feature" && importLayerName === "project") {
         context.report({
           node,
-          message: "Unexpected path '{{importPath}}'. Cannot import {{importLayerName}} into a {{currentLayerName}}.",
-          data: { importPath, currentLayerName, importLayerName },
+          message: messages.projectIntoFeature,
+          data: { importPath },
         })
       }
 
-      if (currentLayerName === "foundation" && importLayerName === "feature" || importLayerName === "project") {
+      if (currentLayerName === "foundation" && importLayerName === "feature") {
         context.report({
           node,
-          message: "Unexpected path '{{importPath}}'. Cannot import {{importLayerName}} into {{currentLayerName}}.",
-          data: { importPath, currentLayerName, importLayerName },
+          message: messages.featureIntoFoundation,
+          data: { importPath },
+        })
+      }
+
+      if (currentLayerName === "foundation" && importLayerName === "project") {
+        context.report({
+          node,
+          message: messages.projectIntoFoundation,
+          data: { importPath },
+        })
+      }
+
+      if (currentLayerName === "project" && importLayerName === "project" && currentModuleName !== importModuleName) {
+        context.report({
+          node,
+          message: messages.projectIntoProject,
+          data: { importPath },
         })
       }
     }

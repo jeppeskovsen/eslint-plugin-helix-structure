@@ -1,7 +1,7 @@
 
 import { RuleTester } from "eslint"
-import rule from "./restricted-imports";
-import { test, testFilePath } from "../utils/testing"
+import rule, { messages } from "./restricted-imports";
+import { test, testFilePath, message } from "../utils/testing"
 
 const ruleTester = new RuleTester()
 
@@ -43,6 +43,13 @@ ruleTester.run("restricted-imports", rule, {
         basePath: "./tests/files"
       }],
     }),
+    test({
+      code: 'import "./Subfolder/Subfile"',
+      filename: testFilePath("./files/project/Eslint/index.js"),
+      options: [{
+        basePath: "./tests/files"
+      }],
+    }),
   ],
 
 
@@ -54,7 +61,7 @@ ruleTester.run("restricted-imports", rule, {
         basePath: "./tests/files"
       }],
       errors: [{
-        message: "Unexpected path '../SuperBanner'. Cannot import feature into a another feature.",
+        message: message(messages.featureIntoFeature, { importPath: "../SuperBanner" }),
         line: 1,
         column: 8,
       }]
@@ -66,12 +73,36 @@ ruleTester.run("restricted-imports", rule, {
         basePath: "./tests/files"
       }],
       errors: [{
-        message: "Unexpected path '../../feature/SuperBanner'. Cannot import feature into foundation.",
+        message: message(messages.featureIntoFoundation, { importPath: "../../feature/SuperBanner" }),
         line: 1,
         column: 8,
       }, {
-        message: "Unexpected path '../../project/Eslint'. Cannot import project into foundation.",
+        message: message(messages.projectIntoFoundation, { importPath: "../../project/Eslint" }),
         line: 2,
+        column: 8,
+      }]
+    }),
+    test({
+      code: 'import "../../project/Eslint"',
+      filename: testFilePath("./files/feature/SuperBanner/index.js"),
+      options: [{
+        basePath: "./tests/files"
+      }],
+      errors: [{
+        message: message(messages.projectIntoFeature, { importPath: "../../project/Eslint" }),
+        line: 1,
+        column: 8,
+      }]
+    }),
+    test({
+      code: 'import "../Other"',
+      filename: testFilePath("./files/project/Eslint/index.js"),
+      options: [{
+        basePath: "./tests/files"
+      }],
+      errors: [{
+        message: message(messages.projectIntoProject, { importPath: "../Other" }),
+        line: 1,
         column: 8,
       }]
     }),
