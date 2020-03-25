@@ -6,13 +6,12 @@ export function testFilePath(relativePath) {
   return path.join(process.cwd(), "tests", relativePath)
 }
 
-export function test(t) {
+export function test<T>(t: T) {
   return {
     ...t,
     parserOptions: {
       sourceType: 'module',
-      ecmaVersion: 6,
-      ...t.parserOptions,
+      ecmaVersion: 6
     }
   }
 }

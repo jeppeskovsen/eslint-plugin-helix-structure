@@ -1,21 +1,21 @@
 
 import { RuleTester } from "eslint"
-import rule from "./restricted-tilde-imports";
-import { test, testFilePath } from "../utils/testing"
+import rule, { messages } from "./restricted-tilde-imports";
+import { test, testFilePath, message } from "../utils/testing"
 
 const ruleTester = new RuleTester()
 
 ruleTester.run("restricted-tilde-imports", rule, {
 
   valid: [
-    test({
+    test<RuleTester.ValidTestCase>({
       code: 'import "~/foundation/BaseBanner"',
       filename: testFilePath("./files/feature/AwesomeBanner/index.js"),
       options: [{
         basePath: "./tests/files"
       }],
     }),
-    test({
+    test<RuleTester.ValidTestCase>({
       code: 'import "./Subfolder/Subfile"',
       filename: testFilePath("./files/feature/AwesomeBanner/index.js"),
       options: [{
@@ -26,14 +26,35 @@ ruleTester.run("restricted-tilde-imports", rule, {
 
 
   invalid: [
-    test({
+    test<RuleTester.InvalidTestCase>({
       code: 'import "../../foundation/BaseBanner"',
       filename: testFilePath("./files/feature/AwesomeBanner/index.js"),
       options: [{
         basePath: "./tests/files"
       }],
+      output: `import "~/foundation/BaseBanner"`,
       errors: [{
-        message: "Unexpected path '../../foundation/BaseBanner', use tilde (~/foundation) import paths when it's from a different layer than feature.",
+        message: message(messages.useTilde, { 
+          importPath: "../../foundation/BaseBanner", 
+          importLayerName: "foundation", 
+          currentLayerName: "feature" 
+        }),
+        line: 1,
+        column: 8,
+      }]
+    }),
+    test<RuleTester.InvalidTestCase>({
+      code: 'import "~/feature/AwesomeBanner/Subfolder/Subfile"',
+      filename: testFilePath("./files/feature/AwesomeBanner/index.js"),
+      options: [{
+        basePath: "./tests/files"
+      }],
+      output: `import "./Subfolder/Subfile"`,
+      errors: [{
+        message: message(messages.useRelative, { 
+          importPath: "~/feature/AwesomeBanner/Subfolder/Subfile", 
+          moduleName: "awesomebanner",
+        }),
         line: 1,
         column: 8,
       }]

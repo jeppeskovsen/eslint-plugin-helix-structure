@@ -8,42 +8,42 @@ const ruleTester = new RuleTester()
 ruleTester.run("restricted-imports", rule, {
 
   valid: [
-    test({
+    test<RuleTester.ValidTestCase>({
       code: 'import "../../foundation/BaseBanner"',
       filename: testFilePath("./files/feature/AwesomeBanner/index.js"),
       options: [{
         basePath: "./tests/files"
       }],
     }),
-    test({
+    test<RuleTester.ValidTestCase>({
       code: 'import "../../foundation/Utils"',
       filename: testFilePath("./files/foundation/BaseBanner/index.js"),
       options: [{
         basePath: "./tests/files"
       }],
     }),
-    test({
+    test<RuleTester.ValidTestCase>({
       code: 'import "../../foundation/Utils"',
       filename: testFilePath("./files/Project/Eslint/index.js"),
       options: [{
         basePath: "./tests/files"
       }],
     }),
-    test({
+    test<RuleTester.ValidTestCase>({
       code: 'import "../../feature/SuperBanner"',
       filename: testFilePath("./files/Project/Eslint/index.js"),
       options: [{
         basePath: "./tests/files"
       }],
     }),
-    test({
+    test<RuleTester.ValidTestCase>({
       code: 'import "./Subfolder/Subfile"',
       filename: testFilePath("./files/feature/AwesomeBanner/index.js"),
       options: [{
         basePath: "./tests/files"
       }],
     }),
-    test({
+    test<RuleTester.ValidTestCase>({
       code: 'import "./Subfolder/Subfile"',
       filename: testFilePath("./files/project/Eslint/index.js"),
       options: [{
@@ -54,7 +54,7 @@ ruleTester.run("restricted-imports", rule, {
 
 
   invalid: [
-    test({
+    test<RuleTester.InvalidTestCase>({
       code: 'import "../SuperBanner"',
       filename: testFilePath("./files/feature/AwesomeBanner/index.js"),
       options: [{
@@ -66,7 +66,7 @@ ruleTester.run("restricted-imports", rule, {
         column: 8,
       }]
     }),
-    test({
+    test<RuleTester.InvalidTestCase>({
       code: 'import "../../feature/SuperBanner"\nimport "../../project/Eslint"',
       filename: testFilePath("./files/foundation/AwesomeBanner/index.js"),
       options: [{
@@ -82,7 +82,7 @@ ruleTester.run("restricted-imports", rule, {
         column: 8,
       }]
     }),
-    test({
+    test<RuleTester.InvalidTestCase>({
       code: 'import "../../project/Eslint"',
       filename: testFilePath("./files/feature/SuperBanner/index.js"),
       options: [{
@@ -94,7 +94,7 @@ ruleTester.run("restricted-imports", rule, {
         column: 8,
       }]
     }),
-    test({
+    test<RuleTester.InvalidTestCase>({
       code: 'import "../Other"',
       filename: testFilePath("./files/project/Eslint/index.js"),
       options: [{
