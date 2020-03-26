@@ -4,5 +4,5 @@ export const rules = {
 };
 
 export const configs = {
-  "recommended": require("../configs/recommended").default
+  "recommended": require("./configs/recommended").default
 }
