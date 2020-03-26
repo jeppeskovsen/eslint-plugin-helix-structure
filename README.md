@@ -1,4 +1,4 @@
-# stylelint-scss-helix-structure
+# eslint-plugin-helix-structure
 
 Install via npm:
 ```
