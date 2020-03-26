@@ -1,6 +1,6 @@
 
 import { RuleTester } from "eslint"
-import rule, { messages } from "./restricted-imports";
+import rule, { messages } from "./restricted-imports"
 import { test, testFilePath, message } from "../utils/testing"
 
 const ruleTester = new RuleTester()

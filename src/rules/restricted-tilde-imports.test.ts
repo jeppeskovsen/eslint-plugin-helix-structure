@@ -1,6 +1,6 @@
 
 import { RuleTester } from "eslint"
-import rule, { messages } from "./restricted-tilde-imports";
+import rule, { messages } from "./restricted-tilde-imports"
 import { test, testFilePath, message } from "../utils/testing"
 
 const ruleTester = new RuleTester()
@@ -50,6 +50,39 @@ ruleTester.run("restricted-tilde-imports", rule, {
         basePath: "./tests/files"
       }],
       output: `import "./Subfolder/Subfile"`,
+      errors: [{
+        message: message(messages.useRelative, { 
+          importPath: "~/feature/AwesomeBanner/Subfolder/Subfile", 
+          moduleName: "awesomebanner",
+        }),
+        line: 1,
+        column: 8,
+      }]
+    }),
+    test<RuleTester.InvalidTestCase>({
+      code: 'import "~/feature/AwesomeBanner/Subfolder/NotExists"',
+      filename: testFilePath("./files/feature/AwesomeBanner/index.js"),
+      options: [{
+        basePath: "./tests/files"
+      }],
+      output: `import "~/feature/AwesomeBanner/Subfolder/NotExists"`,
+      errors: [{
+        message: message(messages.useRelative, { 
+          importPath: "~/feature/AwesomeBanner/Subfolder/NotExists", 
+          moduleName: "awesomebanner",
+        }),
+        line: 1,
+        column: 8,
+      }]
+    }),
+    test<RuleTester.InvalidTestCase>({
+      code: 'import "~/feature/AwesomeBanner/Subfolder/Subfile"',
+      filename: testFilePath("./files/feature/AwesomeBanner/index.js"),
+      options: [{
+        basePath: "./tests/files",
+        ignoreFix: true
+      }],
+      output: `import "~/feature/AwesomeBanner/Subfolder/Subfile"`,
       errors: [{
         message: message(messages.useRelative, { 
           importPath: "~/feature/AwesomeBanner/Subfolder/Subfile", 

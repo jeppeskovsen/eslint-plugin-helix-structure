@@ -12,11 +12,15 @@ export const messages = {
   projectIntoProject: "Unexpected path '{{importPath}}'. Cannot import Project into another Project."
 }
 
+interface RuleOptions {
+  basePath: string
+}
+
 export default {
   meta: {
     type: "problem",
     docs: {
-      url: "todo",
+      url: "https://github.com/jeppeskovsen/eslint-plugin-helix-structure",
     },
     schema: [
       {
@@ -30,7 +34,7 @@ export default {
   },
 
   create: function noRestrictedPaths(context: any) {
-    const options = context.options[0] || {}
+    const options: RuleOptions = context.options[0] || {}
     const basePath = options.basePath || path.join(process.cwd(), "./src")
     const absoluteBasePath = path.resolve(basePath)
     const absoluteCurrentPath = context.getFilename()
@@ -41,11 +45,11 @@ export default {
         return
       }
 
-      const [currentLayerName, currentModuleName] = getLayerAndModuleName(absoluteCurrentPath, absoluteBasePath);
-      if (!currentLayerName || !currentModuleName) return;
+      const [currentLayerName, currentModuleName] = getLayerAndModuleName(absoluteCurrentPath, absoluteBasePath)
+      if (!currentLayerName || !currentModuleName) return
 
-      const [importLayerName, importModuleName] = getLayerAndModuleName(absoluteImportPath, absoluteBasePath);
-      if (!importLayerName || !importModuleName) return;
+      const [importLayerName, importModuleName] = getLayerAndModuleName(absoluteImportPath, absoluteBasePath)
+      if (!importLayerName || !importModuleName) return
 
       if (currentLayerName === "feature" && importLayerName === "feature" && currentModuleName !== importModuleName) {
         context.report({

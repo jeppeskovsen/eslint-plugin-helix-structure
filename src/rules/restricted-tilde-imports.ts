@@ -4,18 +4,23 @@ import { relativeToTilde, tildeToRelative, getAbsolutePath } from "../utils/path
 import { Rule } from "eslint"
 import path from "path"
 import { isStaticRequire } from "../utils/static-require"
+import resolve from "eslint-module-utils/resolve"
 
 export const messages = {
   useTilde: "Unexpected path '{{importPath}}', use tilde (~/{{importLayerName}}) import paths when it's from a different layer than {{currentLayerName}}.",
   useRelative: "Unexpected path '{{importPath}}', use relative import paths within the same module ({{moduleName}})."
 }
 
+interface RuleOptions {
+  basePath: string
+  ignoreFix: boolean
+}
 
 export default {
   meta: {
     type: 'problem',
     docs: {
-      url: "todo",
+      url: "https://github.com/jeppeskovsen/eslint-plugin-helix-structure",
     },
     fixable: "code",
     schema: [
@@ -23,6 +28,7 @@ export default {
         type: "object",
         properties: {
           basePath: { type: "string" },
+          ignoreFix: { type: "boolean" }
         },
         additionalProperties: false
       }
@@ -30,24 +36,24 @@ export default {
   },
 
   create: (context) => {
-    const options = context.options[0] || {}
+    const options: RuleOptions = context.options[0] || {}
     const basePath = options.basePath || path.join(process.cwd(), "./src")
     const absoluteBasePath = path.resolve(basePath)
     const absoluteCurrentFile = context.getFilename()
     const absoluteCurrentPath = path.dirname(absoluteCurrentFile)
 
     function checkForRestrictedTildeImport(importPath: string, node: ESTree.Node) {
-      const parentNode: ESTree.Node = (node as any).parent;
+      const parentNode: ESTree.Node = (node as any).parent
 
-      const absoluteImportPath: string = getAbsolutePath(absoluteBasePath, absoluteCurrentPath, importPath)
+      const absoluteImportPath = getAbsolutePath(absoluteBasePath, absoluteCurrentPath, importPath)
       if (!absoluteImportPath) {
         return
       }
 
-      const [currentLayerName, currentModuleName] = getLayerAndModuleName(absoluteCurrentFile, absoluteBasePath);
+      const [currentLayerName, currentModuleName] = getLayerAndModuleName(absoluteCurrentFile, absoluteBasePath)
       if (!currentLayerName || !currentModuleName) return
 
-      const [importLayerName, importModuleName] = getLayerAndModuleName(absoluteImportPath, absoluteBasePath);
+      const [importLayerName, importModuleName] = getLayerAndModuleName(absoluteImportPath, absoluteBasePath)
       if (!importLayerName || !importModuleName) return
 
       if (currentLayerName === importLayerName && currentModuleName === importModuleName) {
@@ -57,9 +63,14 @@ export default {
             message: messages.useRelative,
             data: { importPath, moduleName: currentModuleName },
             fix(fixer) {
-              const sourceCode = context.getSourceCode().text
-              const newSourceCode = sourceCode.replace(importPath, tildeToRelative(absoluteBasePath, absoluteCurrentPath, importPath))
-              return fixer.replaceTextRange([parentNode.loc.start.column, parentNode.loc.end.column], newSourceCode);
+              const newImport = tildeToRelative(absoluteBasePath, absoluteCurrentPath, importPath)
+              const shouldFix = typeof resolve(newImport, context) !== "undefined"
+              let sourceCode = context.getSourceCode().text
+
+              if (!options.ignoreFix && shouldFix) {
+                sourceCode = sourceCode.replace(importPath, newImport)
+              }
+              return fixer.replaceTextRange([parentNode.loc.start.column, parentNode.loc.end.column], sourceCode)
             }
           })
         }
@@ -73,9 +84,14 @@ export default {
           message: messages.useTilde,
           data: { importPath, importLayerName, currentLayerName },
           fix(fixer) {
-            const sourceCode = context.getSourceCode().text
-            const newSourceCode = sourceCode.replace(importPath, relativeToTilde(absoluteBasePath, absoluteCurrentPath, importPath))
-            return fixer.replaceTextRange([parentNode.loc.start.column, parentNode.loc.end.column], newSourceCode);
+            const newImport =  relativeToTilde(absoluteBasePath, absoluteCurrentPath, importPath)
+            const shouldFix = typeof resolve(importPath, context) !== "undefined"
+            let sourceCode = context.getSourceCode().text
+
+            if (!options.ignoreFix && shouldFix) {
+              sourceCode = sourceCode.replace(importPath, newImport)
+            }
+            return fixer.replaceTextRange([parentNode.loc.start.column, parentNode.loc.end.column], sourceCode)
           }
         })
       }
