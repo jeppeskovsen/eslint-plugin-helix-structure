@@ -65,12 +65,15 @@ export default {
             fix(fixer) {
               const newImport = tildeToRelative(absoluteBasePath, absoluteCurrentPath, importPath)
               const shouldFix = typeof resolve(newImport, context) !== "undefined"
-              let sourceCode = context.getSourceCode().text
 
-              if (!options.ignoreFix && shouldFix) {
-                sourceCode = sourceCode.replace(importPath, newImport)
+              if (options.ignoreFix || !shouldFix) {
+                return
               }
-              return fixer.replaceTextRange([parentNode.loc.start.column, parentNode.loc.end.column], sourceCode)
+  
+              const [rangeFrom, rangeTo] = parentNode.source.range
+              const range: AST.Range = [rangeFrom + 1, rangeTo - 1] // to avoid getting "" (quotes)
+  
+              return fixer.replaceTextRange(range, newImport)
             }
           })
         }

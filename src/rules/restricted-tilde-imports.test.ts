@@ -29,7 +29,9 @@ ruleTester.run("restricted-tilde-imports", rule, {
     test<RuleTester.InvalidTestCase>({
       code: `
         import "~/foundation/Utils"
-        import "../../foundation/BaseBanner"
+        import '../../foundation/BaseBanner'
+
+        var test = "HEJ"
       `,
       filename: testFilePath("./files/feature/AwesomeBanner/index.js"),
       options: [{
@@ -37,13 +39,41 @@ ruleTester.run("restricted-tilde-imports", rule, {
       }],
       output: `
         import "~/foundation/Utils"
-        import "~/foundation/BaseBanner"
+        import '~/foundation/BaseBanner'
+
+        var test = "HEJ"
       `,
       errors: [{
         message: message(messages.useTilde, { 
           importPath: "../../foundation/BaseBanner", 
           importLayerName: "foundation", 
           currentLayerName: "feature" 
+        }),
+        line: 3,
+        column: 16,
+      }]
+    }),
+    test<RuleTester.InvalidTestCase>({
+      code: `
+        import "~/foundation/Utils"
+        import '~/feature/AwesomeBanner/Subfolder/Subfile'
+
+        var test = "HEJ"
+      `,
+      filename: testFilePath("./files/feature/AwesomeBanner/index.js"),
+      options: [{
+        basePath: "./tests/files"
+      }],
+      output: `
+        import "~/foundation/Utils"
+        import './Subfolder/Subfile'
+
+        var test = "HEJ"
+      `,
+      errors: [{
+        message: message(messages.useRelative, { 
+          importPath: "~/feature/AwesomeBanner/Subfolder/Subfile", 
+          moduleName: "awesomebanner",
         }),
         line: 3,
         column: 16,
