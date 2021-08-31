@@ -27,6 +27,29 @@ ruleTester.run("restricted-tilde-imports", rule, {
 
   invalid: [
     test<RuleTester.InvalidTestCase>({
+      code: `
+        import "~/foundation/Utils"
+        import "../../foundation/BaseBanner"
+      `,
+      filename: testFilePath("./files/feature/AwesomeBanner/index.js"),
+      options: [{
+        basePath: "./tests/files"
+      }],
+      output: `
+        import "~/foundation/Utils"
+        import "~/foundation/BaseBanner"
+      `,
+      errors: [{
+        message: message(messages.useTilde, { 
+          importPath: "../../foundation/BaseBanner", 
+          importLayerName: "foundation", 
+          currentLayerName: "feature" 
+        }),
+        line: 3,
+        column: 16,
+      }]
+    }),
+    test<RuleTester.InvalidTestCase>({
       code: 'import "../../foundation/BaseBanner"',
       filename: testFilePath("./files/feature/AwesomeBanner/index.js"),
       options: [{
@@ -91,6 +114,6 @@ ruleTester.run("restricted-tilde-imports", rule, {
         line: 1,
         column: 8,
       }]
-    }),
+    })
   ]
 })

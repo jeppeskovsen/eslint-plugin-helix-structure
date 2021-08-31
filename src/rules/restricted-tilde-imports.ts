@@ -1,7 +1,7 @@
 import * as ESTree from 'estree'
 import { getLayerAndModuleName } from "../utils/helix"
 import { relativeToTilde, tildeToRelative, getAbsolutePath } from "../utils/path-fixer"
-import { Rule } from "eslint"
+import { AST, Rule } from "eslint"
 import path from "path"
 import { isStaticRequire } from "../utils/static-require"
 import resolve from "eslint-module-utils/resolve"
@@ -35,7 +35,7 @@ export default {
     ]
   },
 
-  create: (context) => {
+  create: function restrictedTildeImports(context) {
     const options: RuleOptions = context.options[0] || {}
     const basePath = options.basePath || path.join(process.cwd(), "./src")
     const absoluteBasePath = path.resolve(basePath)
@@ -43,7 +43,7 @@ export default {
     const absoluteCurrentPath = path.dirname(absoluteCurrentFile)
 
     function checkForRestrictedTildeImport(importPath: string, node: ESTree.Node) {
-      const parentNode: ESTree.Node = (node as any).parent
+      const parentNode: ESTree.ImportDeclaration = (node as any).parent
 
       const absoluteImportPath = getAbsolutePath(absoluteBasePath, absoluteCurrentPath, importPath)
       if (!absoluteImportPath) {
@@ -86,12 +86,15 @@ export default {
           fix(fixer) {
             const newImport =  relativeToTilde(absoluteBasePath, absoluteCurrentPath, importPath)
             const shouldFix = typeof resolve(importPath, context) !== "undefined"
-            let sourceCode = context.getSourceCode().text
 
-            if (!options.ignoreFix && shouldFix) {
-              sourceCode = sourceCode.replace(importPath, newImport)
+            if (options.ignoreFix || !shouldFix) {
+              return
             }
-            return fixer.replaceTextRange([parentNode.loc.start.column, parentNode.loc.end.column], sourceCode)
+
+            const [rangeFrom, rangeTo] = parentNode.source.range
+            const range: AST.Range = [rangeFrom + 1, rangeTo - 1] // to avoid getting "" (quotes)
+
+            return fixer.replaceTextRange(range, newImport)
           }
         })
       }

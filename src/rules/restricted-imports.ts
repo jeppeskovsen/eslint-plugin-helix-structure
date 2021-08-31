@@ -2,7 +2,7 @@ import { getLayerAndModuleName } from "../utils/helix"
 import { Rule } from "eslint"
 import path from "path"
 import { isStaticRequire } from "../utils/static-require"
-import resolve from "eslint-module-utils/resolve"
+import { getAbsolutePath } from "../utils/path-fixer"
 
 export const messages = {
   featureIntoFeature: "Unexpected path '{{importPath}}'. Cannot import Feature into another Feature.",
@@ -37,10 +37,11 @@ export default {
     const options: RuleOptions = context.options[0] || {}
     const basePath = options.basePath || path.join(process.cwd(), "./src")
     const absoluteBasePath = path.resolve(basePath)
-    const absoluteCurrentPath = context.getFilename()
+    const absoluteCurrentFile = context.getFilename()
+    const absoluteCurrentPath = path.dirname(absoluteCurrentFile)
 
     function checkForRestrictedImportPath(importPath: string, node: any) {
-      const absoluteImportPath: string = resolve(importPath, context)
+      const absoluteImportPath = getAbsolutePath(absoluteBasePath, absoluteCurrentPath, importPath)
       if (!absoluteImportPath) {
         return
       }

@@ -55,13 +55,13 @@ ruleTester.run("restricted-imports", rule, {
 
   invalid: [
     test<RuleTester.InvalidTestCase>({
-      code: 'import "../SuperBanner"',
+      code: 'import "../SuperBanner/index.js"',
       filename: testFilePath("./files/feature/AwesomeBanner/index.js"),
       options: [{
         basePath: "./tests/files"
       }],
       errors: [{
-        message: message(messages.featureIntoFeature, { importPath: "../SuperBanner" }),
+        message: message(messages.featureIntoFeature, { importPath: "../SuperBanner/index.js" }),
         line: 1,
         column: 8,
       }]
