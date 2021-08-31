@@ -63,13 +63,12 @@ export default {
             message: messages.useRelative,
             data: { importPath, moduleName: currentModuleName },
             fix(fixer) {
-              const newImport = tildeToRelative(absoluteBasePath, absoluteCurrentPath, importPath)
-              const shouldFix = typeof resolve(newImport, context) !== "undefined"
-
-              if (options.ignoreFix || !shouldFix) {
+              if (options.ignoreFix) {
                 return
               }
-  
+
+              const newImport = tildeToRelative(absoluteBasePath, absoluteCurrentPath, importPath)
+              
               const [rangeFrom, rangeTo] = parentNode.source.range
               const range: AST.Range = [rangeFrom + 1, rangeTo - 1] // to avoid getting "" (quotes)
   
@@ -87,12 +86,11 @@ export default {
           message: messages.useTilde,
           data: { importPath, importLayerName, currentLayerName },
           fix(fixer) {
-            const newImport =  relativeToTilde(absoluteBasePath, absoluteCurrentPath, importPath)
-            const shouldFix = typeof resolve(importPath, context) !== "undefined"
-
-            if (options.ignoreFix || !shouldFix) {
+            if (options.ignoreFix) {
               return
             }
+
+            const newImport =  relativeToTilde(absoluteBasePath, absoluteCurrentPath, importPath)
 
             const [rangeFrom, rangeTo] = parentNode.source.range
             const range: AST.Range = [rangeFrom + 1, rangeTo - 1] // to avoid getting "" (quotes)
