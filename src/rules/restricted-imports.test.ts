@@ -50,6 +50,14 @@ ruleTester.run("restricted-imports", rule, {
         basePath: "./tests/files"
       }],
     }),
+    test<RuleTester.ValidTestCase>({
+      code: 'import "../Common"',
+      filename: testFilePath("./files/project/Eslint/index.js"),
+      options: [{
+        basePath: "./tests/files",
+        ignoreCommonProject: true
+      }],
+    }),
   ],
 
 
@@ -102,6 +110,19 @@ ruleTester.run("restricted-imports", rule, {
       }],
       errors: [{
         message: message(messages.projectIntoProject, { importPath: "../Other" }),
+        line: 1,
+        column: 8,
+      }]
+    }),
+    test<RuleTester.InvalidTestCase>({
+      code: 'import "../Common"',
+      filename: testFilePath("./files/project/Eslint/index.js"),
+      options: [{
+        basePath: "./tests/files",
+        ignoreCommonProject: false
+      }],
+      errors: [{
+        message: message(messages.projectIntoProject, { importPath: "../Common" }),
         line: 1,
         column: 8,
       }]

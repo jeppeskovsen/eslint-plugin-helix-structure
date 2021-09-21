@@ -14,6 +14,7 @@ export const messages = {
 
 interface RuleOptions {
   basePath: string
+  ignoreCommonProject: boolean
 }
 
 export default {
@@ -27,6 +28,7 @@ export default {
         type: "object",
         properties: {
           basePath: { type: "string" },
+          ignoreCommonProject: { type: "boolean" },
         },
         additionalProperties: false,
       },
@@ -85,11 +87,21 @@ export default {
       }
 
       if (currentLayerName === "project" && importLayerName === "project" && currentModuleName !== importModuleName) {
-        context.report({
-          node,
-          message: messages.projectIntoProject,
-          data: { importPath },
-        })
+        if (!options.ignoreCommonProject) {
+          context.report({
+            node,
+            message: messages.projectIntoProject,
+            data: { importPath },
+          })
+        } else {
+          if (importModuleName.toLowerCase() != "common") {
+            context.report({
+              node,
+              message: messages.projectIntoProject,
+              data: { importPath },
+            })
+          }
+        }
       }
     }
 

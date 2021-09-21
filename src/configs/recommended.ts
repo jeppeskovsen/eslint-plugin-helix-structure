@@ -4,11 +4,12 @@ export default {
   ],
   rules: {
     "helix-structure/restricted-imports": ["error", { 
-      "basePath": "./src" 
+      "basePath": "./src",
+      "ignoreCommonProject": true
     }],
     "helix-structure/restricted-tilde-imports": ["error", {
       "basePath": "./src", 
-      "ignoreFix": false 
+      "ignoreFix": false
     }],
   }
 }
